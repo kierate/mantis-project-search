@@ -3,7 +3,7 @@ Mantis Project Search
 
 This modifies the project dropdown in the [Mantis Bug Tracker](http://mantisbt.org) to be a searchable list. This is useful if your project list is extensive.
 
-To enable this functionality you have to add the js and css files along with jquery and jquery UI anywhere in the head of the mantis page.
+To enable this functionality you have to copy the *mantis-project-search* folder into your main Mantis directory and then add the js and css files along with jquery and jquery UI anywhere in the head of the mantis page.
 
 ```html
 <!-- mantis project search -->
