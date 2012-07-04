@@ -1,0 +1,38 @@
+#project-select-ac {
+	width: 500px;
+}
+ul.ui-menu {
+	width: 515px;
+}
+#project-select-ac-wrapper a.ui-button {
+	background: none;
+	border: 0;
+	width: 15px;
+}
+.ui-autocomplete {
+	max-height: 300px;
+	overflow-y: auto;
+	/* prevent horizontal scrollbar */
+	overflow-x: hidden;
+	/* add padding to account for vertical scrollbar */
+	padding-right: 20px;
+}
+.ui-autocomplete-category {
+	border-bottom: 1px solid #DEDEDE;
+	font-size: 1.1em;
+	font-weight: bold;
+	padding-bottom: 5px;
+}
+.ui-menu-item + .ui-autocomplete-category {
+	margin-top: 0.5em;
+}
+.ui-menu .ui-menu-item {
+	float: none;
+}
+.ui-menu-item.project-search-category-all-mantis-projects {
+	border-left-width: 4px;
+	border-left-style: solid;
+}
+.project-search-category-all-mantis-projects {
+	border-color: rgb(200,215,245);
+}
