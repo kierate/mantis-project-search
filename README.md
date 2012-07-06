@@ -10,7 +10,7 @@ To enable this functionality you have to copy the *mantis-project-search* folder
 <!-- need jquery and jquery UI (use local versions if you prefer) -->
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-<link rel="stylesheet" class="theme-link" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/base/jquery-ui.css" type="text/css" media="screen" />
+<link rel="stylesheet" class="theme-link" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/base/jquery-ui.css" type="text/css" media="screen" />
 <!-- autocomplete code & css -->
 <script type="text/javascript" src="mantis-project-search/mantis-project-search.js"></script>
 <link rel="stylesheet" href="mantis-project-search/mantis-project-search.css" type="text/css" />

@@ -3,6 +3,7 @@
 }
 ul.ui-menu {
 	width: 515px;
+	font-size: 0.9em;
 }
 #project-select-ac-wrapper a.ui-button {
 	background: none;
