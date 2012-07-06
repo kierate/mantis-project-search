@@ -37,11 +37,11 @@ $(document).ready(function() {
 		var ac_input = $('<div id="project-select-ac-wrapper" style="display:none"></div>');
 		ac_input.append('<input id="project-select-ac" type="text" value="" />');
 		ac_input.append('<input id="project-select-hidden" type="hidden" value="" name="project_id" />');
-		$('select[name=project_id]').after(ac_input);
+		$('form[name=form_set_project] select[name=project_id]').after(ac_input);
 
 		//hide + disable the original dropdown field
-		$('select[name=project_id]').hide();
-		$('select[name=project_id]').attr("disabled", "disabled");
+		$('form[name=form_set_project] select[name=project_id]').hide();
+		$('form[name=form_set_project] select[name=project_id]').attr("disabled", "disabled");
 
 		//show the autocomplete field
 		$('#project-select-ac-wrapper').css('display', 'inline');
@@ -50,7 +50,7 @@ $(document).ready(function() {
 		var data = new Array();
 
 		//loop through items in the original dropdown (which is now hidden)
-		$('select[name=project_id] option').each(function(index) {
+		$('form[name=form_set_project] select[name=project_id] option').each(function(index) {
 				if ($(this).text().length != 0) {
 						//as a base the current item has the id and a text (plus an empty css class)
 						var current = {
