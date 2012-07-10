@@ -17,6 +17,7 @@ $.widget( "custom.mantiscomplete", $.ui.autocomplete, {
 	_renderItem: function( ul, item) { //this function is almost the same as core but adds the css class for the item
 		return $( "<li></li>" )
 			.addClass(item.css_class)
+			.attr( "originalvalue", item.value )
 			.data( "item.autocomplete", item )
 			.append( $( "<a></a>" ).text( item.label ) )
 			.appendTo( ul );
@@ -86,7 +87,10 @@ $(document).ready(function() {
 
 				//if one of the options in the dropdown was selected then show it in the autocomplete field
 				if($(this).attr("selected")) {
+					//put the text in the input field
 					$('#project-select-ac').val($(this).text());
+					//put the value in the hidden field
+					$('#project-select-hidden').val($(this).val());
 				}
 
 		});
@@ -149,14 +153,21 @@ $(document).ready(function() {
 				var input = $("#project-select-ac");
 				// close if already visible
 				if (input.mantiscomplete("widget").is(":visible")) {
-					input.mantiscomplete("close");
+					$("ul.ui-menu li").remove(); //not using input.mantiscomplete("close") here as this causes scrolling to break on subsequent clicks
 					return;
 				}
+
 				$(this).blur();
 
 				// pass empty string as value to search for, displaying all results
 				input.mantiscomplete("search", "");
 				input.focus();
+
+				var original_value = $('#project-select-hidden').val();
+				if (original_value.length != 0) {
+					var top = Math.round($("ul.ui-menu li.ui-menu-item[originalvalue='" + original_value + "']").position().top);
+					$("ul.ui-menu").animate({"scrollTop": top}, 0);
+				}
 			});
 
 });
