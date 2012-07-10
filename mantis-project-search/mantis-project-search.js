@@ -118,6 +118,9 @@ $(document).ready(function() {
 		$("#project-select-ac").mantiscomplete({
 			source: data,
 			minLength: 0, //this has to be 0 for the "Show all" toggle to work
+			focus: function(event, ui) {
+				return false; //you can show the value when an item is in focus with $('#project-select-ac').val(ui.item.label);
+			},
 			select: function(event, ui) {
 				//when an option is selected:
 				//put the text in the input field
