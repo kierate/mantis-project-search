@@ -22,7 +22,7 @@ To enable this functionality you have to copy the *mantis-project-search* folder
 Categories
 ----------
 
-If you are reading this then you most likely have a large number projects in your Mantis installation. Searching them makes things easier but you can also create "categories" i.e. top level groupings for multiple projects.
+If you are reading this then you most likely have a large number projects in your Mantis installation. Searching them makes things easier but you can also create "categories" i.e. top level groupings for multiple projects. Combined with some CSS styling this makes distinguishing between similar projects in different categories much simpler.
 
 #### Enabling categories
 
