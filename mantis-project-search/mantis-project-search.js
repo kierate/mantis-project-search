@@ -112,7 +112,11 @@ $(document).ready(function() {
 
 		//when a user selectes the autocomplete field - select the text
 		$("#project-select-ac").focus(function(){
-			this.select();
+			$(this).select();
+			//fix issue with the input being deselected in Chrome
+			$(this).mouseup(function(e){
+				e.preventDefault();
+			});
 		});
 
 		//remove the original mantis "Switch" button (not needed even without the autocompletion)
