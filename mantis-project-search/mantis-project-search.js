@@ -52,46 +52,46 @@ $(document).ready(function() {
 
 		//loop through items in the original dropdown (which is now hidden)
 		$('form[name=form_set_project] select[name=project_id] option').each(function(index) {
-				if ($(this).text().length != 0) {
-						//as a base the current item has the id and a text (plus an empty css class)
-						var current = {
-							label:     $(this).text(),
-							value:     $(this).attr('value'),
-							css_class: ""
-						};
+			if ($(this).text().length != 0) {
+				//as a base the current item has the id and a text (plus an empty css class)
+				var current = {
+					label:     $(this).text(),
+					value:     $(this).attr('value'),
+					css_class: ""
+				};
 
-						//if using categories
-						if (categories.length > 0) {
-							//find what "category" to put the current mantis project into
-							var current_category_name;
-							var current_category_css_class;
-							var i;
-							for (i = 0; i < categories.length; i++) { //goes through all categories defined above
-								if ($(this).attr('value') == categories[i].id) { //the value (project_id) equals (so top-level match)
-									current_category_name = categories[i].name;
-									current_category_css_class = categories[i].css_class;
-								} else if ($(this).attr('value').indexOf(categories[i].id) == 0) { //the value (project_id) begins with (so sub-category)
-									current_category_name = categories[i].name;
-									current_category_css_class = categories[i].css_class;
-								}
-							}
-
-							//store the category name and css class in the current item
-							current.category = current_category_name;
-							current.css_class = current_category_css_class;
+				//if using categories
+				if (categories.length > 0) {
+					//find what "category" to put the current mantis project into
+					var current_category_name;
+					var current_category_css_class;
+					var i;
+					for (i = 0; i < categories.length; i++) { //goes through all categories defined above
+						if ($(this).attr('value') == categories[i].id) { //the value (project_id) equals (so top-level match)
+							current_category_name = categories[i].name;
+							current_category_css_class = categories[i].css_class;
+						} else if ($(this).attr('value').indexOf(categories[i].id) == 0) { //the value (project_id) begins with (so sub-category)
+							current_category_name = categories[i].name;
+							current_category_css_class = categories[i].css_class;
 						}
+					}
 
-						//add the current item (id, text and optionally the category information)
-						data.push(current);
+					//store the category name and css class in the current item
+					current.category = current_category_name;
+					current.css_class = current_category_css_class;
 				}
 
-				//if one of the options in the dropdown was selected then show it in the autocomplete field
-				if($(this).attr("selected")) {
-					//put the text in the input field
-					$('#project-select-ac').val($(this).text());
-					//put the value in the hidden field
-					$('#project-select-hidden').val($(this).val());
-				}
+				//add the current item (id, text and optionally the category information)
+				data.push(current);
+			}
+
+			//if one of the options in the dropdown was selected then show it in the autocomplete field
+			if($(this).attr("selected")) {
+				//put the text in the input field
+				$('#project-select-ac').val($(this).text());
+				//put the value in the hidden field
+				$('#project-select-hidden').val($(this).val());
+			}
 
 		});
 
