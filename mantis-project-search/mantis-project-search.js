@@ -1,4 +1,49 @@
 $.widget( "custom.mantiscomplete", $.ui.autocomplete, {
+	options: {
+		getHiddenField: function() {
+			return null;
+		}
+	},
+	//this function is slightly different than the core one to show the project list on key up/down
+	_move: function( direction, event ) {
+		if ( !this.menu.element.is(":visible") ) {
+			var field = this.options.getHiddenField();
+			var selected_project = field == null ? null : field.attr("selected-project-name");
+			var original_value   = field == null ? null : field.val();
+
+			//when the typed in value is the selected project then on key up/down we show the whole list of projects
+			if (this.element.val() == selected_project) {
+				this.search( "", event );
+				this.scrollToSelectedProject(original_value);
+			} else {
+				//by default search based on the typed in value - this is what core autocomplete does
+				this.search( null, event );
+			}
+
+			return;
+		}
+		if ( this.menu.first() && /^previous/.test(direction) ||
+				this.menu.last() && /^next/.test(direction) ) {
+			this.element.val( this.term );
+			this.menu.deactivate();
+			return;
+		}
+		this.menu[ direction ]( event );
+	},
+
+	scrollToSelectedProject: function(original_value) {
+		if (original_value.length != 0) {
+			var li = this.menu.element.children("li.ui-menu-item[originalvalue='" + original_value + "']");
+
+			var offset = li.offset().top - this.menu.element.offset().top;
+			var scroll = this.menu.element.scrollTop();
+			var top = Math.round(scroll + offset);
+			this.menu.element.scrollTop(top);
+
+			this.menu.activate(null, li);
+		}
+	},
+	//render the menu with categories
 	_renderMenu: function( ul, items ) {
 		var self = this;
 		var current_category = "";
@@ -14,7 +59,8 @@ $.widget( "custom.mantiscomplete", $.ui.autocomplete, {
 			self._renderItem( ul, item );
 		});
 	},
-	_renderItem: function( ul, item) { //this function is almost the same as core but adds the css class for the item
+	//this function is almost the same as core but adds the css class and the originalvalue attribute to the item
+	_renderItem: function( ul, item) {
 		return $( "<li></li>" )
 			.addClass(item.css_class)
 			.attr( "originalvalue", item.value )
@@ -91,6 +137,8 @@ $(document).ready(function() {
 			$('#project-select-ac').val($(this).text());
 			//put the value in the hidden field
 			$('#project-select-hidden').val($(this).val());
+			//store the original text in a hidden field for later use
+			$('#project-select-hidden').attr("selected-project-name", $(this).text());
 		}
 
 	});
@@ -126,17 +174,20 @@ $(document).ready(function() {
 	$("#project-select-ac").mantiscomplete({
 		source: data,
 		minLength: 0, //this has to be 0 for the "Show all" toggle to work
+		getHiddenField: function() {
+			return $('#project-select-hidden');
+		},
 		focus: function(event, ui) {
 			return false; //you can show the value when an item is in focus with $('#project-select-ac').val(ui.item.label);
 		},
 		select: function(event, ui) {
 			//when an option is selected:
 			//put the text in the input field
-			$('#project-select-ac').val(ui.item.label);
+			$(this).val(ui.item.label);
 			//put the value in the hidden field
 			$('#project-select-hidden').val(ui.item.value);
 			//submit the form
-			$('form[name=form_set_project]').submit();
+			$(this).parents('form').submit();
 			return false;
 		}
 	});
@@ -157,7 +208,7 @@ $(document).ready(function() {
 			var input = $("#project-select-ac");
 			// close if already visible
 			if (input.mantiscomplete("widget").is(":visible")) {
-				$("ul.ui-menu li").remove(); //not using input.mantiscomplete("close") here as this causes scrolling to break on subsequent clicks
+				input.mantiscomplete("close");
 				return;
 			}
 
@@ -167,11 +218,8 @@ $(document).ready(function() {
 			input.mantiscomplete("search", "");
 			input.focus();
 
-			var original_value = $('#project-select-hidden').val();
-			if (original_value.length != 0) {
-				var top = Math.round($("ul.ui-menu li.ui-menu-item[originalvalue='" + original_value + "']").position().top);
-				$("ul.ui-menu").animate({"scrollTop": top}, 0);
-			}
+			//if there was a project selected then scroll to it and activate it
+			input.mantiscomplete("scrollToSelectedProject", $('#project-select-hidden').val());
 		});
 
 });
