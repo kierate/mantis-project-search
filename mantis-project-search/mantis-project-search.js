@@ -52,7 +52,12 @@ $.widget( "custom.mantiscomplete", $.ui.autocomplete, {
 			if (typeof item.category != 'undefined') {
 				//show the category (whenever it is different than the last one)
 				if ( item.category != current_category ) {
-					ul.append( "<li class='ui-autocomplete-category " + item.css_class + "'>" + item.category + "</li>" );
+					$( "<li></li>" )
+						.addClass( "ui-autocomplete-category" )
+						.addClass( item.css_class )
+						.text( item.category )
+						.appendTo( ul );
+
 					current_category = item.category;
 				}
 			}
