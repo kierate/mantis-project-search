@@ -1,11 +1,11 @@
-#project-select-ac {
+.project-select-ac {
 	width: 500px;
 }
 ul.ui-menu {
 	width: 515px;
 	font-size: 0.9em;
 }
-#project-select-ac-wrapper a.ui-button {
+.project-select-ac-wrapper a.ui-button {
 	background: none;
 	border: 0;
 	width: 15px;
