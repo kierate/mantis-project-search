@@ -68,7 +68,7 @@ $.widget( "custom.mantiscomplete", $.ui.autocomplete, {
 	_renderItem: function( ul, item) {
 		return $( "<li></li>" )
 			.addClass(item.css_class)
-			.attr( "originalvalue", item.value )
+			.attr( "originalvalue", item.multi_level_project_ids )
 			.data( "item.autocomplete", item )
 			.append( $( "<a></a>" ).text( item.label ) )
 			.appendTo( ul );
@@ -82,11 +82,14 @@ $(document).ready(function() {
 	//add autocompletion to the "top project selection" dropdown
 	var data = dropdownToAutocomplete('form[name=form_set_project] select[name=project_id]', true, true);
 
-	//add autocompletion to the "move bug(s) to project" dropdown
-	dropdownToAutocomplete('form[action=bug_actiongroup.php] table[class=width75] select[name=project_id]', true, false, data);
+	//when moving issues in mantis the dummy "All projects" project is not used
+	data.shift();
+
+	//add autocompletion to the "move issue(s) to project" dropdown
+	dropdownToAutocomplete('form[action=bug_actiongroup.php] table[class=width75] select[name=project_id]', false, false, data);
 });
 
-function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, submit_form_on_selection, data_to_use)
+function dropdownToAutocomplete(dropdown_field_selector, select_multi_level_project_ids, submit_form_on_selection, data_to_use)
 {
 	if ($(dropdown_field_selector).length == 0) {
 		return false;
@@ -135,11 +138,16 @@ function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, 
 		//loop through items in the original dropdown (which is now hidden)
 		$(dropdown_field_selector + ' option').each(function(index) {
 			if ($(this).text().length != 0) {
+				//figure out the project id (within a multi-level project hierarchy - separated by semi-colons)
+				var val = $(this).attr('value').split(';');
+				var project_id = val[val.length-1];
+
 				//as a base the current item has the id and a text (plus an empty css class)
 				var current = {
-					label:     $(this).text(),
-					value:     $(this).attr('value'),
-					css_class: ""
+					label:                    $(this).text(),
+					value:                    project_id,
+					multi_level_project_ids:  $(this).attr('value'),
+					css_class:                 ""
 				};
 
 				//if using categories
@@ -149,10 +157,10 @@ function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, 
 					var current_category_css_class;
 					var i;
 					for (i = 0; i < categories.length; i++) { //goes through all categories defined above
-						if ($(this).attr('value') == categories[i].id) { //the value (project_id) equals (so top-level match)
+						if (current.multi_level_project_ids == categories[i].id) { //the multi-level project ids equal to the category id (so top-level match)
 							current_category_name = categories[i].name;
 							current_category_css_class = categories[i].css_class;
-						} else if ($(this).attr('value').indexOf(categories[i].id) == 0) { //the value (project_id) begins with (so sub-category)
+						} else if (current.multi_level_project_ids.indexOf(categories[i].id) == 0) { //the multi-level project ids begin with the category id (so sub-category)
 							current_category_name = categories[i].name;
 							current_category_css_class = categories[i].css_class;
 						}
@@ -166,17 +174,6 @@ function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, 
 				//add the current item (id, text and optionally the category information)
 				data.push(current);
 			}
-
-			//if one of the options in the dropdown was selected then show it in the autocomplete field
-			if($(this).attr("selected")) {
-				//put the text in the input field
-				$("#" + autocomplete).val($(this).text());
-				//put the value in the hidden field
-				$("#" + hidden).val($(this).val());
-				//store the original text in a hidden field for later use
-				$("#" + hidden).attr("selected-project-name", $(this).text());
-			}
-
 		});
 
 		//when using categories the array has to be reordered slightly to
@@ -197,6 +194,17 @@ function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, 
 		data = data_to_use;
 	}
 
+	//if one of the options in the dropdown was selected then show it in the autocomplete field
+	var selected_option = $(dropdown_field_selector + ' option:selected');
+	if (selected_option.length > 0) {
+		//put the text in the input field
+		$("#" + autocomplete).val(selected_option.text());
+		//put the value in the hidden field
+		$("#" + hidden).val(selected_option.val());
+		//store the original text in a hidden field for later use
+		$("#" + hidden).attr("selected-project-name", selected_option.text());
+	}
+
 	//initialise auto complete
 	$("#" + autocomplete).mantiscomplete({
 		source: data,
@@ -212,7 +220,11 @@ function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, 
 			//put the text in the input field
 			$(this).val(ui.item.label);
 			//put the value in the hidden field
-			$("#" + hidden).val(ui.item.value);
+			if (select_multi_level_project_ids) {
+				$("#" + hidden).val(ui.item.multi_level_project_ids);
+			} else {
+				$("#" + hidden).val(ui.item.value);
+			}
 
 			if (submit_form_on_selection) {
 				//submit the form
@@ -223,37 +235,35 @@ function dropdownToAutocomplete(dropdown_field_selector, append_combo_dropdown, 
 		}
 	});
 
-	if (append_combo_dropdown) {
-		//add a link to show all items (imitate the regular dropdown behaviour)
-		//this pretty much makes it into a combobox (could use some more styling though)
-		$( "<a>" )
-			.attr("tabIndex", -1)
-			.attr("title", "Show All Items")
-			.appendTo($('#' + wrapper))
-			.button({
-				icons: {
-					primary: "ui-icon-triangle-1-s"
-				},
-				text: false
-			})
-			.click(function() {
-				var input = $("#" + autocomplete);
-				//close if already visible
-				if (input.mantiscomplete("widget").is(":visible")) {
-					input.mantiscomplete("close");
-					return;
-				}
+	//add a link to show all items (imitate the regular dropdown behaviour)
+	//this pretty much makes it into a combobox (could use some more styling though)
+	$("<a>")
+		.attr("tabIndex", -1)
+		.attr("title", "Show All Items")
+		.appendTo($('#' + wrapper))
+		.button({
+			icons: {
+				primary: "ui-icon-triangle-1-s"
+			},
+			text: false
+		})
+		.click(function() {
+			var input = $("#" + autocomplete);
+			//close if already visible
+			if (input.mantiscomplete("widget").is(":visible")) {
+				input.mantiscomplete("close");
+				return;
+			}
 
-				$(this).blur();
+			$(this).blur();
 
-				//pass empty string as value to search for, displaying all results
-				input.mantiscomplete("search", "");
-				input.focus();
+			//pass empty string as value to search for, displaying all results
+			input.mantiscomplete("search", "");
+			input.focus();
 
-				//if there was a project selected then scroll to it and activate it
-				input.mantiscomplete("scrollToSelectedProject", $("#" + hidden).val());
-			});
-	}
+			//if there was a project selected then scroll to it and activate it
+			input.mantiscomplete("scrollToSelectedProject", $("#" + hidden).val());
+		});
 
 	return data;
 }
